@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>رولت لوکس</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="رولت لوکس">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='100%25' height='100%25' fill='%23ffd700'/%3E%3Ctext x='50%25' y='55%25' font-size='72' text-anchor='middle' dominant-baseline='middle' fill='%23000'%3E💎%3C/text%3E%3C/svg%3E">
+<link rel="manifest" id="manifestlink">
+
+<style>
+html,body{margin:0;height:100%;font-family:Montserrat,system-ui;background:#0a0a0a;color:#fff;display:flex;align-items:center;justify-content:center}
+.card{width:400px;background:rgba(255,255,255,0.05);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:24px;box-shadow:0 8px 40px rgba(0,0,0,0.6);text-align:center}
+h1{margin:0 0 16px;font-size:22px;background:linear-gradient(90deg,#ffd700,#ffb400);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stage{height:200px;display:flex;align-items:center;justify-content:center;position:relative;margin-bottom:16px}
+svg{width:280px;height:auto}
+#cyl{transition:transform 1s ease-in-out;transform-origin:center}
+.flash{position:absolute;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffd700 30%,rgba(255,215,0,0) 70%);opacity:0;pointer-events:none}
+button{width:100%;padding:14px;border:0;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,#ffd700,#ffae00);color:#000;box-shadow:0 6px 20px rgba(255,215,0,0.3)}
+.result{margin-top:16px;font-size:18px;font-weight:700}
+.lucky{color:#10b981}
+.unlucky{color:#ef4444}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>رولت لوکس</h1>
+  <div class="stage">
+    <svg viewBox="0 0 400 200">
+      <defs>
+        <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#ffd700"/>
+          <stop offset="100%" stop-color="#ffae00"/>
+        </linearGradient>
+      </defs>
+      <rect x="140" y="80" width="220" height="40" rx="12" fill="url(#gold)" stroke="#333" stroke-width="4"/>
+      <circle id="cyl" cx="110" cy="100" r="50" fill="#111" stroke="url(#gold)" stroke-width="6"/>
+      <circle cx="110" cy="100" r="10" fill="url(#gold)"/>
+    </svg>
+    <div class="flash" id="flash"></div>
+  </div>
+  <button id="play">امتحان کن</button>
+  <div id="out" class="result"></div>
+</div>
+
+<script>
+const cyl=document.getElementById("cyl");
+const flash=document.getElementById("flash");
+const btn=document.getElementById("play");
+const out=document.getElementById("out");
+btn.addEventListener("click",()=>{
+  cyl.style.transform="rotate("+Math.floor(Math.random()*360)+"deg)";
+  flash.style.opacity="1";
+  setTimeout(()=>flash.style.opacity="0",300);
+  const res=Math.random()<0.5?"lucky":"unlucky";
+  out.textContent=res==="lucky"?"خوش‌شانس 🎉":"بدشانس ⚠️";
+  out.className="result "+res;
+});
+</script>
+</body>
+</html>
