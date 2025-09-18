@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>رولت امن — فقط برای سرگرمی</title>
+
+<!-- PWA / iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="رولت امن">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='100%25' height='100%25' fill='%23ffcc00'/%3E%3Ctext x='50%25' y='55%25' font-size='72' text-anchor='middle' dominant-baseline='middle' fill='%23000'%3E🎯%3C/text%3E%3C/svg%3E">
+<link rel="manifest" id="manifestlink">
+
+<style>
+:root{--bg:#071026;--card:#0f1724;--accent:#ffcc00;--muted:#94a3b8}
+html,body{height:100%;margin:0;font-family: Vazirmatn, system-ui, -apple-system, "Segoe UI", Roboto; background:linear-gradient(180deg,#071026 0%, #0b1020 100%); color:#e6eef8; -webkit-font-smoothing:antialiased}
+.wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:22px;width:380px;box-shadow:0 8px 30px rgba(2,6,23,0.6);text-align:center}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.title{display:flex;align-items:center;gap:10px}
+.h1{font-size:18px;color:var(--accent);margin:0}
+.badge{background:rgba(255,204,0,0.12);color:var(--accent);padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;border:1px solid rgba(255,204,0,0.08)}
+.small-muted{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* main */
+.stage{height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin:10px 0 14px}
+.gun{width:240px;height:80px;position:relative;transform-origin:center center;transition:transform .6s ease}
+.barrel{position:absolute;left:40%;top:30%;width:55%;height:22%;background:#111827;border-radius:6px 12px 12px 6px}
+.cylinder{position:absolute;left:8%;top:18%;width:30%;height:64%;border-radius:50%;background:linear-gradient(180deg,#0f1724,#0b1220);display:flex;align-items:center;justify-content:center}
+.cyl-slot{width:74%;height:74%;border-radius:50%;background:conic-gradient(#1f2937 0 25%, #111827 0 50%, #1f2937 0 75%, #0b1220 0 100%);transform:rotate(0deg);transition:transform .6s ease}
+.muzzle-flash{position:absolute;right:6%;top:32%;width:30px;height:30px;border-radius:50%;filter:blur(2px);opacity:0;pointer-events:none}
+.projectile{position:absolute;right:8%;top:44%;width:12px;height:12px;border-radius:50%;background:#ffb84d;transform:translateX(0) scale(0.6);opacity:0}
+.spin{animation:spinAnim .9s linear}
+@keyframes spinAnim{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.flashAnim{animation:flash 200ms ease-out forwards}
+@keyframes flash{0%{transform:scale(.4);opacity:1}100%{transform:scale(2.4);opacity:0}}
+.projAnim{animation:fire 600ms cubic-bezier(.2,.9,.2,1) forwards}
+@keyframes fire{0%{transform:translateX(0) scale(.6);opacity:1}60%{transform:translateX(-45%) scale(1.2)}100%{transform:translateX(-200%) scale(3);opacity:0}}
+
+#action{appearance:none;border:0;padding:12px 16px;border-radius:12px;background:linear-gradient(90deg,var(--accent),#ffb800);font-weight:800;color:#071026;font-size:16px;cursor:pointer;box-shadow:0 6px 18px rgba(255,204,0,0.12);width:100%}
+.result{font-size:17px;padding:10px;border-radius:10px;margin-top:10px;background:rgba(255,255,255,0.02)}
+.lucky{color:#10b981;font-weight:800}
+.unlucky{color:#ef4444;font-weight:800}
+.note{font-size:13px;color:var(--muted);margin-top:8px}
+.footer-row{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.install-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:10px;color:var(--muted);font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" role="application" aria-label="بازی رولت امن">
+    <div class="header-row">
+      <div class="title">
+        <div>
+          <div class="h1">رولت (نسخهٔ امن)</div>
+          <div class="small-muted">یک تجربهٔ کوچک و کارتونی</div>
+        </div>
+      </div>
+      <div class="badge" aria-hidden="true">فقط برای سرگرمیه</div>
+    </div>
+
+    <div class="stage" aria-hidden="false">
+      <div class="gun" id="gun" role="img" aria-label="gun graphic">
+        <div class="cylinder">
+          <div class="cyl-slot" id="cyl"></div>
+        </div>
+        <div class="barrel"></div>
+        <div class="muzzle-flash" id="flash"></div>
+        <div class="projectile" id="proj"></div>
+      </div>
+    </div>
+
+    <button id="action">فشار بده و امتحان کن</button>
+
+    <div id="out" class="result" aria-live="polite" style="display:none"></div>
+    <div class="note" id="explain">این بازی کاملاً نمایشی و برای سرگرمی است — هر چیزی که در بازی می‌بینی واقعی نیست. (مرگ و اینا صرفاً در داستان بازی مطرح می‌شوند و جدی نیست)</div>
+
+    <div class="footer-row">
+      <button class="install-btn" id="addHomeBtn" style="display:none">افزودن به صفحهٔ اصلی</button>
+      <button class="install-btn" id="refreshBtn">بازنشانی</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// PWA manifest dynamic basic
+const manifest = {
+  "name":"رولت امن",
+  "short_name":"رولت",
+  "start_url":".",
+  "display":"standalone",
+  "background_color":"#071026",
+  "theme_color":"#ffcc00",
+  "icons":[{"src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='100%25' height='100%25' fill='%23ffcc00'/%3E%3Ctext x='50%25' y='55%25' font-size='72' text-anchor='middle' dominant-baseline='middle' fill='%23000'%3E🎯%3C/text%3E%3C/svg%3E", "sizes":"192x192", "type":"image/svg+xml"}]
+};
+document.getElementById('manifestlink').setAttribute('href', URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'})));
+
+// Service worker (inline registration)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-safe.js').catch(()=>{/* ignore */});
+}
+
+// Simple in-page mock service worker file via blob (for environments where /sw-safe.js isn't present)
+(function createBlobSW(){
+  const code = `
+self.addEventListener('install', e=>{self.skipWaiting();});
+self.addEventListener('activate', e=>{self.clients.claim();});
+self.addEventListener('fetch', ()=>{});`;
+  try {
+    const url = URL.createObjectURL(new Blob([code], {type:'application/javascript'}));
+    navigator.serviceWorker.register(url).catch(()=>{});
+  } catch(e){}
+})();
+
+// Add to home screen (Android)
+let deferredPrompt = null;
+const addHomeBtn = document.getElementById('addHomeBtn');
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  addHomeBtn.style.display = 'inline-block';
+});
+addHomeBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const choice = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  addHomeBtn.style.display = 'none';
+});
+
+// UI logic
+const action = document.getElementById('action');
+const gun = document.getElementById('gun');
+const cyl = document.getElementById('cyl');
+const flash = document.getElementById('flash');
+const proj = document.getElementById('proj');
+const out = document.getElementById('out');
+const refreshBtn = document.getElementById('refreshBtn');
+
+function randChoice() {
+  return Math.random() < 0.5 ? 'lucky' : 'unlucky';
+}
+function showResult(kind){
+  out.style.display = 'block';
+  if(kind === 'lucky'){
+    out.innerHTML = '<span class="lucky">خوش‌شانس! 🎉</span><div style="margin-top:6px;font-size:13px;color:var(--muted)">شما امشب خوش‌شانس هستی — فقط برای سرگرمی.</div>';
+  } else {
+    out.innerHTML = '<span class="unlucky">بدشانس! ⚠️</span><div style="margin-top:6px;font-size:13px;color:var(--muted)">نتیجه بازی نشان از «بدشانس» بودن دارد — دوباره امتحان کن. (این همه‌اش نمایشی است)</div>';
+  }
+}
+
+function animateFire(kind){
+  // spin cylinder
+  cyl.style.transform = 'rotate(360deg)';
+  gun.classList.add('spin');
+  setTimeout(()=>gun.classList.remove('spin'), 900);
+
+  // flash
+  flash.style.background = kind === 'lucky' ? 'radial-gradient(circle, #fff 0%, #ffd66b 30%, rgba(255,200,0,0) 60%)' : 'radial-gradient(circle, #fff 0%, #ff7b7b 30%, rgba(255,0,0,0) 60%)';
+  flash.classList.add('flashAnim');
+  flash.style.opacity = '1';
+  setTimeout(()=>{ flash.classList.remove('flashAnim'); flash.style.opacity = '0'; }, 300);
+
+  // projectile
+  proj.classList.add('projAnim');
+  proj.style.opacity = '1';
+  setTimeout(()=>{ proj.classList.remove('projAnim'); proj.style.opacity = '0'; }, 700);
+}
+
+action.addEventListener('click', ()=>{
+  action.disabled = true;
+  out.style.display = 'none';
+  const kind = randChoice();
+  animateFire(kind);
+  setTimeout(()=>{ showResult(kind); action.disabled = false; }, 900);
+});
+
+refreshBtn.addEventListener('click', ()=>{
+  out.style.display = 'none';
+  cyl.style.transform = 'rotate(0deg)';
+});
+</script>
+</body>
+</html>
