@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+<title>PWA رولت مستطیلی</title>
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="رولت مستطیلی">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='100%25' height='100%25' fill='%23ffd700'/%3E%3Ctext x='50%25' y='55%25' font-size='72' text-anchor='middle' dominant-baseline='middle' fill='%23000'%3E7%3C/text%3E%3C/svg%3E">
+<link rel="manifest" id="manifestlink">
+
+<style>
+body{margin:0;height:100%;display:flex;align-items:center;justify-content:center;background:#0d0d0d;font-family:sans-serif;color:#fff}
+.wrap{text-align:center;width:100%}
+.container{position:relative;width:100%;height:100px;overflow:hidden;margin:auto}
+.strip{position:absolute;top:0;width:100%;height:100px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#111;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.strip span{pointer-events:none}
+button{margin-top:30px;padding:14px 24px;font-size:16px;font-weight:700;border:0;border-radius:14px;background:linear-gradient(90deg,#ffd700,#ff9f00);cursor:pointer;box-shadow:0 6px 20px rgba(255,215,0,0.3)}
+.result{margin-top:24px;font-size:22px;font-weight:800}
+.good{color:#10b981}
+.bad{color:#ef4444}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="container" id="cont"></div>
+  <button id="play">شروع</button>
+  <div id="out" class="result"></div>
+</div>
+
+<script>
+// manifest inline
+const manifest = {
+  "name":"رولت مستطیلی",
+  "short_name":"رولت",
+  "start_url":".",
+  "display":"standalone",
+  "background_color":"#0d0d0d",
+  "theme_color":"#ffd700",
+  "icons":[{"src":"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='100%25' height='100%25' fill='%23ffd700'/%3E%3Ctext x='50%25' y='55%25' font-size='72' text-anchor='middle' dominant-baseline='middle' fill='%23000'%3E7%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]
+};
+document.getElementById('manifestlink').setAttribute('href', URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type:'application/json'})));
+
+// service worker quick
+if ('serviceWorker' in navigator){
+  const code=`self.addEventListener('install',e=>self.skipWaiting());
+self.addEventListener('activate',e=>self.clients.claim());
+self.addEventListener('fetch',()=>{});`;
+  const url=URL.createObjectURL(new Blob([code],{type:'application/javascript'}));
+  navigator.serviceWorker.register(url).catch(()=>{});
+}
+
+// logic
+const cont=document.getElementById("cont");
+const out=document.getElementById("out");
+const items=["پوکه","پر","پوکه","پر","پوکه","پر","پوکه"];
+let strips=[];
+
+function createStrips(){
+  cont.innerHTML="";
+  strips=[];
+  items.forEach((t,i)=>{
+    let d=document.createElement("div");
+    d.className="strip";
+    d.style.left=(i*100)+"%";
+    d.style.background=t==="پر"?"linear-gradient(180deg,#ffd700,#ff9f00)":"#ccc";
+    d.innerHTML="<span>"+t+"</span>";
+    cont.appendChild(d);
+    strips.push(d);
+  });
+}
+createStrips();
+
+document.getElementById("play").addEventListener("click",()=>{
+  out.textContent="";
+  let stopIndex=Math.floor(Math.random()*items.length);
+  let offset = -stopIndex*100;
+  strips.forEach((d,i)=>{
+    d.style.transition="transform 1s ease-in-out";
+    d.style.transform="translateX("+offset+"%)";
+  });
+  setTimeout(()=>{
+    const res=items[stopIndex];
+    out.textContent=res==="پر"?"پر ⚠️":"پوکه 🎉";
+    out.className="result "+(res==="پر"?"bad":"good");
+  },1000);
+});
+</script>
+</body>
+</html>
